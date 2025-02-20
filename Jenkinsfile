@@ -12,7 +12,7 @@ pipeline {
         stage('Checkout Repository') {
             steps {
                 git branch: 'main', 
-                url: 'https://github.com/your-username/k8s-ansible.git'
+                url: 'https://github.com/Antonshepitko/k8s-install.git'
             }
         }
 
@@ -36,15 +36,6 @@ pipeline {
                     )
                 }
             }
-        }
-    }
-
-    post {
-        success {
-            slackSend channel: '#devops', message: "✅ K8s установлен на ${params.SERVER_IP}"
-        }
-        failure {
-            slackSend channel: '#devops', message: "❌ Ошибка установки K8s на ${params.SERVER_IP}"
         }
     }
 }
