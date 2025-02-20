@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'SERVER_IP', description: 'IP целевого сервера')
+        string(name: 'SERVER_IP', defaultValue: '45.144.52.219', description: 'IP целевого сервера')
         string(name: 'NODE_NAME', defaultValue: 'master', description: 'Имя ноды')
         string(name: 'SSH_USER', defaultValue: 'root', description: 'SSH-пользователь')
-        password(name: 'SSH_PASSWORD', description: 'SSH-пароль')
+        password(name: 'SSH_PASSWORD', defaultValue: 'Fynjif1999', description: 'SSH-пароль')
     }
 
     stages {
@@ -27,9 +27,9 @@ pipeline {
 
                     // Запуск Ansible с параметрами
                     ansiblePlaybook(
-                        playbook: 'playbooks/k8s-install.yml',
-                        inventory: 'inventories/production/hosts',
-                        credentialsId: 'your-ssh-credential-id', // ID ваших SSH-ключей
+                        playbook: 'k8s-ansible/playbooks/k8s-install.yml',
+                        inventory: 'k8s-ansible/inventories/production/hosts',
+                        credentialsId: 'k8s-ansible/your-ssh-credential-id', // ID ваших SSH-ключей
                         extraVars: [
                             node_name: "${params.NODE_NAME}"
                         ]
