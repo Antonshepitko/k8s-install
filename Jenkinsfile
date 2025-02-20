@@ -3,48 +3,48 @@ pipeline {
 
     parameters {
         string(name: 'SERVER_IP', description: 'IP целевого сервера')
+        string(name: 'NODE_NAME', defaultValue: 'master', description: 'Имя ноды')
         string(name: 'SSH_USER', defaultValue: 'root', description: 'SSH-пользователь')
-        password(name: 'SSH_PASSWORD', description: 'Пароль для SSH')
+        password(name: 'SSH_PASSWORD', description: 'SSH-пароль')
     }
 
     stages {
         stage('Checkout Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/your-username/k8s-autoinstall.git'
+                git branch: 'main', 
+                url: 'https://github.com/your-username/k8s-ansible.git'
             }
         }
 
-        stage('Install Kubernetes') {
+        stage('Run Ansible Playbook') {
             steps {
                 script {
-                    // Проверка наличия обязательных параметров
-                    if (!params.SERVER_IP?.trim()) {
-                        error("SERVER_IP не указан!")
-                    }
-
-                    // Запуск скрипта
-                    sh """
-                        chmod +x scripts/install-k8s.sh
-                        ./scripts/install-k8s.sh \
-                            "${params.SERVER_IP}" \
-                            "${params.SSH_USER}" \
-                            "${params.SSH_PASSWORD}"
+                    // Генерация динамического инвентори
+                    writeFile file: 'inventories/dynamic/hosts', text: """
+                    [control_plane]
+                    ${params.NODE_NAME} ansible_host=${params.SERVER_IP} ansible_user=${params.SSH_USER}
                     """
-                }
-            }
-        }
 
-        stage('Post-Install Check') {
-            steps {
-                script {
-                    // Проверка доступности ноды (пример)
-                    sh """
-                        sshpass -p "${params.SSH_PASSWORD}" ssh -o StrictHostKeyChecking=no ${params.SSH_USER}@${params.SERVER_IP} \
-                            "kubectl get nodes | grep 'Ready'"
-                    """
+                    // Запуск Ansible с параметрами
+                    ansiblePlaybook(
+                        playbook: 'playbooks/deploy-k8s.yml',
+                        inventory: 'inventories/dynamic/hosts',
+                        credentialsId: 'your-ssh-credential-id', // ID ваших SSH-ключей
+                        extraVars: [
+                            node_name: "${params.NODE_NAME}"
+                        ]
+                    )
                 }
             }
         }
     }
 
+    post {
+        success {
+            slackSend channel: '#devops', message: "✅ K8s установлен на ${params.SERVER_IP}"
+        }
+        failure {
+            slackSend channel: '#devops', message: "❌ Ошибка установки K8s на ${params.SERVER_IP}"
+        }
+    }
 }

@@ -1,0 +1,6 @@
+---
+- name: Deploy Kubernetes Control Plane
+  hosts: control_plane
+  become: yes
+  roles:
+    - k8s-controlplane

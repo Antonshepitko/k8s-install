@@ -1,0 +1,2 @@
+[control_plane]
+master ansible_host=45.144.52.219 ansible_user=root
