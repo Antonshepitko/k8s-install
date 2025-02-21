@@ -29,7 +29,8 @@ pipeline {
                     ansiblePlaybook(
                         playbook: 'k8s-ansible/playbooks/k8s-install.yml',
                         inventory: 'k8s-ansible/inventories/production/hosts',
-                        credentialsId: 'k8s-ansible/your-ssh-credential-id', // ID ваших SSH-ключей
+                        credentialsId: 'k8s-ansible/your-ssh-credential-id',
+                        extras: '-e "ANSIBLE_ROLES_PATH=k8s-ansible/roles"', // ID ваших SSH-ключей
                         extraVars: [
                             node_name: "${params.NODE_NAME}"
                         ]

@@ -1,9 +1,6 @@
-# Имя ноды
 node_name: "master"
 
-# Версии компонентов
 k8s_version: "1.28.0-1.1"
 containerd_version: "1.6.8-1"
 
-# Параметры кластера
 pod_network_cidr: "10.244.0.0/16"

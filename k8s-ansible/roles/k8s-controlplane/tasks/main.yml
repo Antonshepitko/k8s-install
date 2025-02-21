@@ -12,7 +12,7 @@
     modprobe overlay
     modprobe br_netfilter
   args:
-    warn: false  # Игнорировать предупреждения если модули уже загружены
+    warn: false
 
 - name: Configure sysctl
   ansible.builtin.copy:
@@ -50,7 +50,7 @@
       - kubeadm={{ k8s_version }}
       - kubectl={{ k8s_version }}
     state: present
-    force: yes  # Принудительно установить версию
+    force: yes  # Принудительная установка версии
 
 - name: Initialize Kubernetes control plane
   ansible.builtin.command: kubeadm init --pod-network-cidr={{ pod_network_cidr }} --ignore-preflight-errors=NumCPU
